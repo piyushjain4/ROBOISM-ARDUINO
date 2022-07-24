@@ -83,7 +83,7 @@ cv2.imshow("shapes",img5)
 key = cv2.waitKey(0)
 cv2.destroyAllWindows()
 
-#coverting image to gray
+#converting image to gray
 gray = cv2.cvtColor(img5,cv2.COLOR_BGR2GRAY)
 
 #finding canny image
@@ -92,8 +92,15 @@ canny = cv2.Canny(gray,30,150)
 #finding contours
 cont, hier = cv2.findContours(canny,cv2.RETR_LIST,cv2.CHAIN_APPROX_SIMPLE)
 
+#lower and upper hsv values of green,orange,black,pink-peach,etc.
+lower = [[36,50,70],[10,50,70],[0,0,0],[4,4,216]]
+upper = [[89,255,255],[24,255,255],[180,255,30],[29,35,251]]
+
 flag = 0
 img_5 = img5.copy()
+
+# converting image to hsv
+hsv = cv2.cvtColor(img_5,cv2.COLOR_BGR2HSV)
 i = 0
 print(img_5.shape)
 for cnt in cont:
@@ -120,20 +127,13 @@ for cnt in cont:
             tantheta2 = ((rghtbtm[0]-lftbtm[0])/(rghtbtm[1]-lftbtm[1]))
             angle2 = math.degrees(np.arctan(tantheta2)) 
             print(angle2)
-            pixel = img_5[cx1,cy1]
 
-            #printing ids according to the colour of shapes
-            # print(pixel)
-            if np.all(pixel==[0,0,0]):
-                print("id =3")
-            elif np.all(pixel==[210,222,228]):
-                print("id = 4")
-            elif np.all(pixel==[9,127,240]):
-                print("id = 2")
-            else:
-                print("id = 1")
-
-
+        # printing ids according to colours
+            for k in range(4) :
+                mask = cv2.inRange(hsv,np.array(lower[k]),np.array(upper[k]))
+                pixel = mask[cx1,cy1]
+                if np.all(pixel == [255,255,255]):
+                    print("ID = ",k+1)
 
             #making the squares black
             cv2.drawContours(img_5,[approx],-1,(0,0,0),-1)
